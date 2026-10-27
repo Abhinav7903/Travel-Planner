@@ -84,11 +84,11 @@ export default async function LandingPage() {
             <div className="paper-card overflow-hidden shadow-[0_30px_90px_rgba(57,58,48,.13)]">
               <div className="flex items-center justify-between border-b border-line px-5 py-4">
                 <div>
-                  <p className="eyebrow">Kyoto & Tokyo</p>
-                  <p className="mt-0.5 text-[15px] font-semibold">Seven slow days in spring</p>
+                  <p className="eyebrow">Delhi → Shimla → Kalpa</p>
+                  <p className="mt-0.5 text-[15px] font-semibold">Slow days in the Himalayas</p>
                 </div>
                 <div className="flex -space-x-1.5">
-                  {["AM", "YK", "SR"].map((label, index) => (
+                  {["FR", "CH"].map((label, index) => (
                     <span
                       key={label}
                       className="flex h-7 w-7 items-center justify-center rounded-full bg-[#e7ebe2] text-[9px] font-semibold text-forest ring-2 ring-paper"
@@ -103,63 +103,48 @@ export default async function LandingPage() {
               <div className="grid min-h-[310px] grid-cols-[1fr_118px] sm:grid-cols-[1fr_155px]">
                 <div className="relative overflow-hidden bg-[#f9f6ef] p-5">
                   <div className="absolute inset-0 opacity-50 [background-image:radial-gradient(#d8d2c4_0.7px,transparent_0.7px)] [background-size:16px_16px]" />
-                  <svg className="absolute inset-0 h-full w-full" viewBox="0 0 320 300" preserveAspectRatio="none" fill="none">
-                    <path
-                      d="M62 70 C 92 60, 120 86, 146 104 S 188 132, 225 120"
-                      stroke="#b9b3a5"
-                      strokeWidth="1.3"
-                      strokeDasharray="3 4"
-                    />
-                    <path
-                      d="M146 104 C 154 140, 128 158, 102 182 S 78 224, 116 238"
-                      stroke="#b9b3a5"
-                      strokeWidth="1.3"
-                      strokeDasharray="3 4"
-                    />
-                    <path d="M225 120 C 250 152, 244 190, 218 214" stroke="#b9b3a5" strokeWidth="1.3" strokeDasharray="3 4" />
-                  </svg>
                   <div className="relative space-y-3">
                     <div className="flex items-start gap-3">
                       <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-forest text-[10px] font-semibold text-paper">
-                        09
+                        01
                       </div>
-                      <div className="min-w-0 rounded-xl border border-line bg-paper px-3 py-2.5 shadow-sm">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">Temples & gardens</p>
-                        <p className="mt-0.5 text-[12.5px] font-semibold">Fushimi Inari at first light</p>
+                      <div className="min-w-0 rounded-xl border border-line bg-paper/95 px-3 py-2.5 shadow-sm backdrop-blur-[1px]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">Arrive</p>
+                        <p className="mt-0.5 text-[12.5px] font-semibold">Delhi to Shimla</p>
                         <p className="mt-1 flex items-center gap-1 text-[10.5px] text-ink-soft">
-                          <MapPin size={10} /> Fushimi, Kyoto · 7:10 AM
+                          <MapPin size={10} /> Shimla · Morning
                         </p>
                       </div>
                     </div>
                     <div className="ml-10 flex items-center gap-2 text-[9.5px] text-ink-faint">
                       <span className="h-px w-5 border-t border-dashed border-line-strong" />
-                      Walk · 18 min · 1.2 km
+                      Drive · Scenic route
                     </div>
                     <div className="flex items-start gap-3">
                       <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#eadfce] text-[10px] font-semibold text-[#745739]">
-                        10
+                        02
                       </div>
-                      <div className="min-w-0 rounded-xl border border-line bg-paper px-3 py-2.5 shadow-sm">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">Together</p>
-                        <p className="mt-0.5 text-[12.5px] font-semibold">Lunch at Nishiki Market</p>
+                      <div className="min-w-0 rounded-xl border border-line bg-paper/95 px-3 py-2.5 shadow-sm backdrop-blur-[1px]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">Explore</p>
+                        <p className="mt-0.5 text-[12.5px] font-semibold">Mall Road & Ridge walk</p>
                         <p className="mt-1 flex items-center gap-1 text-[10.5px] text-ink-soft">
-                          <MapPin size={10} /> Downtown · 12:20 PM
+                          <MapPin size={10} /> Shimla · Afternoon
                         </p>
                       </div>
                     </div>
                     <div className="ml-10 flex items-center gap-2 text-[9.5px] text-ink-faint">
                       <span className="h-px w-5 border-t border-dashed border-line-strong" />
-                      Transit · ~25 min
+                      Walk · Around town
                     </div>
                     <div className="flex items-start gap-3">
                       <div className="mt-1 flex h-7 w-7 shrink-0 items-center justify-center rounded-lg bg-[#e4e2ee] text-[10px] font-semibold text-[#514d72]">
-                        02
+                        03
                       </div>
-                      <div className="min-w-0 rounded-xl border border-line bg-paper px-3 py-2.5 shadow-sm">
-                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">Food & city</p>
-                        <p className="mt-0.5 text-[12.5px] font-semibold">Gion after dark</p>
+                      <div className="min-w-0 rounded-xl border border-line bg-paper/95 px-3 py-2.5 shadow-sm backdrop-blur-[1px]">
+                        <p className="text-[10px] font-semibold uppercase tracking-wider text-ink-faint">High hills</p>
+                        <p className="mt-0.5 text-[12.5px] font-semibold">Kalpa at sunset</p>
                         <p className="mt-1 flex items-center gap-1 text-[10.5px] text-ink-soft">
-                          <MapPin size={10} /> Higashiyama · 6:40 PM
+                          <MapPin size={10} /> Kalpa, Kinnaur · Evening
                         </p>
                       </div>
                     </div>
@@ -169,30 +154,30 @@ export default async function LandingPage() {
                 <div className="border-l border-line bg-[#f5f1e7] p-4">
                   <p className="eyebrow mb-3">Day 02</p>
                   <div className="space-y-4">
-                    {["08:00", "12:20", "18:40"].map((time, index) => (
+                    {["09:00", "14:00", "17:30"].map((time, index) => (
                       <div key={time} className="relative pl-4">
                         <span className="absolute left-0 top-1 h-1.5 w-1.5 rounded-full bg-forest" />
                         {index < 2 ? <span className="route-line absolute left-[2.5px] top-3 h-8 w-px" /> : null}
                         <p className="text-[10px] font-semibold text-ink">{time}</p>
                         <p className="mt-0.5 text-[9.5px] leading-snug text-ink-soft">
-                          {["Coffee, then east", "Market lunch", "Lanterns & dinner"][index]}
+                          {["Drive to Kufri", "Lunch at Shimla", "Drive to Kalpa"][index]}
                         </p>
                       </div>
                     ))}
                   </div>
                   <div className="mt-5 rounded-xl border border-line bg-paper p-2.5">
-                    <p className="text-[8.5px] font-semibold uppercase tracking-wider text-ink-faint">Map notes</p>
-                    <p className="mt-1 text-[9px] leading-snug text-ink-soft">15 min walk between stops. Route left open.</p>
+                    <p className="text-[8.5px] font-semibold uppercase tracking-wider text-ink-faint">Route notes</p>
+                    <p className="mt-1 text-[9px] leading-snug text-ink-soft">Mountain roads. Take breaks. Views ahead.</p>
                   </div>
                 </div>
               </div>
               <div className="flex flex-wrap items-center justify-between gap-3 border-t border-line px-5 py-3.5">
                 <div className="flex gap-4 text-[11px] text-ink-soft">
                   <span className="flex items-center gap-1.5">
-                    <CalendarDays size={12} /> Apr 4 – 10
+                    <CalendarDays size={12} /> May 12 – 18
                   </span>
                   <span className="flex items-center gap-1.5">
-                    <Users size={12} /> 3 travellers
+                    <Users size={12} /> 2 travellers
                   </span>
                 </div>
                 <span className="inline-flex items-center gap-1.5 rounded-lg bg-forest-soft px-2 py-1 text-[10px] font-semibold text-forest">
@@ -229,8 +214,8 @@ export default async function LandingPage() {
                 visual={
                   <div className="mt-6 space-y-2">
                     {[
-                      { label: "Temples & gardens", color: "#1f4d3d" },
-                      { label: "Food & city", color: "#b46d4c" },
+                      { label: "Sightseeing", color: "#1f4d3d" },
+                      { label: "Food & views", color: "#b46d4c" },
                     ].map((group) => (
                       <div key={group.label} className="flex items-center gap-2.5 rounded-xl border border-line bg-paper px-3 py-2.5">
                         <span className="h-2 w-2 rounded-full" style={{ background: group.color }} />
@@ -270,12 +255,12 @@ export default async function LandingPage() {
                 visual={
                   <div className="mt-6 space-y-2">
                     <div className="flex items-center justify-between rounded-xl border border-line bg-paper px-3 py-2.5 text-[12px]">
-                      <span className="text-ink-soft">Alex paid</span>
-                      <span className="font-semibold tabular-nums">¥18,400</span>
+                      <span className="text-ink-soft">Friday paid</span>
+                      <span className="font-semibold tabular-nums">₹18,400</span>
                     </div>
                     <div className="flex items-center justify-between rounded-xl bg-forest-soft px-3 py-2.5 text-[12px]">
-                      <span className="text-forest">Maya owes Alex</span>
-                      <span className="font-semibold tabular-nums text-forest">¥6,133</span>
+                      <span className="text-forest">Chips owes Friday</span>
+                      <span className="font-semibold tabular-nums text-forest">₹6,133</span>
                     </div>
                   </div>
                 }
@@ -370,22 +355,22 @@ function GraphVisual() {
         <path d="M344 96 C 404 76, 446 96, 478 124" stroke="#aeb2a4" strokeWidth="1.4" strokeDasharray="3 4" />
         <path d="M296 154 C 362 162, 420 144, 478 124" stroke="#aeb2a4" strokeWidth="1.4" strokeDasharray="3 4" />
         <rect x="40" y="34" width="116" height="46" rx="10" fill="#fdfbf7" stroke="#ddd7ca" />
-        <text x="54" y="53" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">08:10 · KYOTO</text>
-        <text x="54" y="68" fill="#252721" fontSize="10" fontWeight="600">Fushimi Inari</text>
+        <text x="54" y="53" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">09:00 · DELHI</text>
+        <text x="54" y="68" fill="#252721" fontSize="10" fontWeight="600">Depart for Shimla</text>
         <rect x="160" y="68" width="116" height="46" rx="10" fill="#fdfbf7" stroke="#ddd7ca" />
-        <text x="174" y="87" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">11:40 · GION</text>
-        <text x="174" y="102" fill="#252721" fontSize="10" fontWeight="600">Tea at Ippodo</text>
+        <text x="174" y="87" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">14:00 · SHIMLA</text>
+        <text x="174" y="102" fill="#252721" fontSize="10" fontWeight="600">Mall Road stroll</text>
         <rect x="278" y="130" width="116" height="46" rx="10" fill="#fdfbf7" stroke="#ddd7ca" />
-        <text x="292" y="149" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">14:00 · EAST</text>
-        <text x="292" y="164" fill="#252721" fontSize="10" fontWeight="600">Philosopher's Path</text>
+        <text x="292" y="149" fill="#92958a" fontSize="7.5" fontWeight="600" letterSpacing=".8">16:00 · SHIMLA</text>
+        <text x="292" y="164" fill="#252721" fontSize="10" fontWeight="600">Ridge sunset walk</text>
         <rect x="304" y="38" width="116" height="46" rx="10" fill="#fdfbf7" stroke="#1f4d3d" strokeWidth="1.2" />
         <text x="318" y="57" fill="#1f4d3d" fontSize="7.5" fontWeight="600" letterSpacing=".8">TOGETHER</text>
-        <text x="318" y="72" fill="#252721" fontSize="10" fontWeight="600">Nishiki Market</text>
+        <text x="318" y="72" fill="#252721" fontSize="10" fontWeight="600">Shimla lunch</text>
         <rect x="418" y="96" width="112" height="46" rx="10" fill="#f7ede4" stroke="#dec9ba" />
-        <text x="432" y="115" fill="#9a5939" fontSize="7.5" fontWeight="600" letterSpacing=".8">FOOD GROUP</text>
-        <text x="432" y="130" fill="#252721" fontSize="10" fontWeight="600">Pontocho alley</text>
-        <text x="250" y="58" fill="#8c8f84" fontSize="7.5">walk · 18m</text>
-        <text x="226" y="128" fill="#8c8f84" fontSize="7.5">transit · 24m</text>
+        <text x="432" y="115" fill="#9a5939" fontSize="7.5" fontWeight="600" letterSpacing=".8">HILLS GROUP</text>
+        <text x="432" y="130" fill="#252721" fontSize="10" fontWeight="600">Kalpa lookout</text>
+        <text x="250" y="58" fill="#8c8f84" fontSize="7.5">drive · 7h</text>
+        <text x="226" y="128" fill="#8c8f84" fontSize="7.5">drive · 8h</text>
       </svg>
       <div className="absolute bottom-2.5 left-2.5 flex gap-1.5">
         <span className="rounded-md border border-line bg-paper px-2 py-1 text-[9px] font-medium text-ink-soft">Graph</span>
