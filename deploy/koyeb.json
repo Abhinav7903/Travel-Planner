@@ -1,0 +1,77 @@
+{
+  "$schema": "https://wayfarer.local/schemas/koyeb-service-v1.json",
+  "description": "Koyeb service definition for the Wayfarer Go API. Create the service with the Koyeb CLI/API using these values. Secrets are referenced, never embedded.",
+  "app": "wayfarer-api",
+  "service": {
+    "name": "wayfarer-api",
+    "type": "WEB",
+    "instance_type": "nano",
+    "regions": ["fra"],
+    "ports": [
+      {
+        "port": 8080,
+        "protocol": "http"
+      }
+    ],
+    "health_checks": [
+      {
+        "grace_period": 15,
+        "interval": 30,
+        "restart_limit": 3,
+        "timeout": 5,
+        "type": "HTTP",
+        "http": {
+          "path": "/healthz",
+          "port": 8080
+        }
+      }
+    ],
+    "build": {
+      "type": "DOCKERFILE",
+      "dockerfile": "apps/api/Dockerfile",
+      "context": ".",
+      "workdir": "/"
+    },
+    "env": [
+      { "key": "APP_ENV", "value": "production" },
+      { "key": "PORT", "value": "8080" },
+      { "key": "MIGRATIONS_DIR", "value": "/app/migrations" },
+      { "key": "WEB_ORIGIN", "value": "https://YOUR_VERCEL_DOMAIN", "secret": false },
+      { "key": "PUBLIC_WEB_URL", "value": "https://YOUR_VERCEL_DOMAIN", "secret": false },
+      { "key": "MAIL_MODE", "value": "smtp", "secret": false },
+      { "key": "SMTP_HOST", "value": "smtp.gmail.com", "secret": false },
+      { "key": "SMTP_PORT", "value": "587", "secret": false },
+      { "key": "SMTP_USERNAME", "value": "you@example.com", "secret": false },
+      { "key": "SMTP_PASSWORD", "secret": "SMTP_PASSWORD" },
+      { "key": "MAIL_FROM", "value": "Wayfarer <you@example.com>", "secret": false },
+      { "key": "DATABASE_URL", "secret": "DATABASE_URL" },
+      { "key": "OTP_HMAC_SECRET", "secret": "OTP_HMAC_SECRET" },
+      { "key": "SESSION_SECRET", "secret": "SESSION_SECRET" },
+      { "key": "INTERNAL_API_TOKEN", "secret": "INTERNAL_API_TOKEN" },
+      { "key": "TRUST_PROXY_HEADER", "value": "true", "secret": false },
+      { "key": "DB_MAX_CONNS", "value": "8", "secret": false }
+    ],
+    "scaling": {
+      "min": 1,
+      "max": 1
+    },
+    "strategy": {
+      "type": "ROLLING"
+    }
+  },
+  "migration_job": {
+    "description": "Run once per deploy before shifting traffic to the new revision, or as a Koyeb job.",
+    "image_command": ["/app/migrate", "-dir", "/app/migrations"],
+    "requires": [
+      "DATABASE_URL"
+    ]
+  },
+  "notes": [
+    "Vercel must reach the API over HTTPS, so expose the Koyeb service endpoint; every /v1 route requires the shared X-Internal-Token.",
+    "Set INTERNAL_API_TOKEN to the same 32+ character random value in Vercel and on Koyeb.",
+    "Never put the Koyeb origin or token in browser code or NEXT_PUBLIC_* variables; the browser only talks to /api on Vercel.",
+    "Create the database and run the migration job before the first web deployment.",
+    "Maps need no API key: OSM.de street tiles and Esri World Imagery satellite tiles are loaded by the browser.",
+    "Rotate any database credential or Gmail app password that has been pasted into a chat or committed. Use a Koyeb secret for SMTP_PASSWORD."
+  ]
+}

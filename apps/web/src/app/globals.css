@@ -1,0 +1,291 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas: #f6f3ec;
+  --color-paper: #fdfbf7;
+  --color-ink: #252721;
+  --color-ink-soft: #64675e;
+  --color-ink-faint: #92958a;
+  --color-line: #e3ded2;
+  --color-line-strong: #d2ccbd;
+  --color-forest: #1f4d3d;
+  --color-forest-deep: #163a2e;
+  --color-forest-soft: #e8efe9;
+  --color-clay: #b46d4c;
+  --color-sand: #eee8dc;
+  --font-sans: ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  --font-serif: "Iowan Old Style", "Palatino Linotype", "Book Antiqua", Georgia, serif;
+  --shadow-soft: 0 1px 2px rgba(37, 39, 33, 0.04), 0 8px 30px rgba(37, 39, 33, 0.05);
+  --shadow-lift: 0 2px 4px rgba(37, 39, 33, 0.05), 0 18px 50px rgba(37, 39, 33, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--color-canvas);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  min-height: 100vh;
+  margin: 0;
+  background: var(--color-canvas);
+  font-family: var(--font-sans);
+}
+
+::selection {
+  background: #cfdfd3;
+  color: #163a2e;
+}
+
+a {
+  color: inherit;
+}
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+button {
+  cursor: pointer;
+}
+
+:focus-visible {
+  outline: 2px solid var(--color-forest);
+  outline-offset: 2px;
+}
+
+.display {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+}
+
+.eyebrow {
+  font-size: 0.68rem;
+  font-weight: 650;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  color: var(--color-ink-faint);
+}
+
+.grain {
+  position: relative;
+}
+
+.grain::after {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  content: "";
+  opacity: 0.25;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.12'/%3E%3C/svg%3E");
+}
+
+.hairline {
+  border-color: var(--color-line);
+}
+
+.scroll-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #cfc8b8 transparent;
+}
+
+.paper-card {
+  border: 1px solid var(--color-line);
+  border-radius: 1.25rem;
+  background: var(--color-paper);
+  box-shadow: var(--shadow-soft);
+}
+
+.mesh {
+  background-image:
+    radial-gradient(at 14% 18%, rgba(207, 223, 211, 0.7) 0px, transparent 46%),
+    radial-gradient(at 85% 8%, rgba(238, 226, 203, 0.9) 0px, transparent 42%),
+    radial-gradient(at 72% 82%, rgba(219, 227, 212, 0.55) 0px, transparent 48%);
+}
+
+.route-line {
+  background-image: linear-gradient(to bottom, transparent 0 8px, #c9c3b4 8px 13px, transparent 13px);
+  background-size: 1px 13px;
+  background-repeat: repeat-y;
+}
+
+.skeleton {
+  position: relative;
+  overflow: hidden;
+  background: #e9e4d9;
+}
+.skeleton::after {
+  position: absolute;
+  inset: 0;
+  content: "";
+  transform: translateX(-100%);
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.55), transparent);
+  animation: shimmer 1.6s infinite;
+}
+@keyframes shimmer {
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.reveal {
+  animation: reveal 0.55s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+.reveal-delay {
+  animation: reveal 0.55s 0.08s cubic-bezier(0.2, 0.7, 0.2, 1) both;
+}
+@keyframes reveal {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* React Flow theme */
+.react-flow {
+  --xy-background-color: #f9f6ef;
+  --xy-node-border-radius: 16px;
+  --xy-edge-stroke: #b9b3a5;
+  --xy-edge-stroke-selected: #1f4d3d;
+}
+.react-flow__attribution {
+  background: transparent !important;
+  color: #92958a !important;
+  font-size: 9px !important;
+}
+.react-flow__controls {
+  overflow: hidden;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--shadow-soft) !important;
+}
+.react-flow__controls-button {
+  background: var(--color-paper) !important;
+  border-bottom-color: var(--color-line) !important;
+  color: var(--color-ink) !important;
+}
+.react-flow__minimap {
+  overflow: hidden;
+  border: 1px solid var(--color-line) !important;
+  border-radius: 12px !important;
+  background: #f7f3ea !important;
+}
+.react-flow__handle {
+  width: 9px !important;
+  height: 9px !important;
+  border: 2px solid var(--color-paper) !important;
+  background: var(--color-forest) !important;
+}
+.react-flow__edge-path {
+  stroke-width: 1.6;
+}
+.react-flow__edge.selected .react-flow__edge-path {
+  stroke-width: 2.4;
+}
+.react-flow__edge-text {
+  font-size: 10px;
+  fill: #6f7268;
+}
+.react-flow__edge-textbg {
+  fill: #f9f6ef;
+}
+.react-flow__node.selected .wf-node {
+  border-color: var(--color-forest);
+  box-shadow: 0 0 0 3px rgba(31, 77, 61, 0.12), var(--shadow-lift);
+}
+
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  margin: 1.35em 0 0.45em;
+  color: var(--color-ink);
+}
+.markdown h1 {
+  font-size: 1.7rem;
+}
+.markdown h2 {
+  font-size: 1.35rem;
+}
+.markdown h3 {
+  font-size: 1.1rem;
+}
+.markdown p,
+.markdown li {
+  line-height: 1.7;
+  color: #44473f;
+}
+.markdown p {
+  margin: 0.7em 0;
+}
+.markdown ul,
+.markdown ol {
+  padding-left: 1.3rem;
+  margin: 0.7em 0;
+}
+.markdown ul {
+  list-style: disc;
+}
+.markdown ol {
+  list-style: decimal;
+}
+.markdown a {
+  color: var(--color-forest);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.markdown code {
+  padding: 0.12rem 0.32rem;
+  border-radius: 5px;
+  background: var(--color-sand);
+  font-size: 0.86em;
+}
+.markdown blockquote {
+  margin: 1em 0;
+  padding-left: 1rem;
+  border-left: 2px solid var(--color-line-strong);
+  color: var(--color-ink-soft);
+}
+.markdown hr {
+  margin: 1.5rem 0;
+  border-color: var(--color-line);
+}
+.markdown table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+.markdown th,
+.markdown td {
+  padding: 0.45rem 0.6rem;
+  border: 1px solid var(--color-line);
+  text-align: left;
+}

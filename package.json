@@ -1,0 +1,21 @@
+{
+  "name": "wayfarer",
+  "private": true,
+  "packageManager": "pnpm@11.5.2",
+  "engines": {
+    "node": ">=20.9.0"
+  },
+  "scripts": {
+    "dev": "pnpm --filter @wayfarer/web dev",
+    "dev:web": "pnpm --filter @wayfarer/web dev",
+    "dev:api": "go -C apps/api run ./cmd/server",
+    "build": "pnpm --filter @wayfarer/web build",
+    "lint": "pnpm --filter @wayfarer/web lint",
+    "typecheck": "pnpm --filter @wayfarer/web typecheck",
+    "test": "pnpm --filter @wayfarer/web test && go -C apps/api test ./...",
+    "test:web": "pnpm --filter @wayfarer/web test",
+    "test:api": "go -C apps/api test ./...",
+    "test:e2e": "pnpm --filter @wayfarer/web test:e2e",
+    "seed:dev": "go -C apps/api run ./cmd/seed"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "app_env": "development",
+  "port": "8080",
+  "database_url": "postgres://wayfarer:change-me@localhost:5433/wayfarer?sslmode=disable",
+  "db_max_conns": 10,
+  "web_origins": [
+    "http://localhost:3000"
+  ],
+  "public_web_url": "http://localhost:3000",
+  "otp_hmac_secret": "replace-with-at-least-32-random-characters",
+  "session_secret": "replace-with-at-least-32-random-characters",
+  "internal_api_token": "replace-with-at-least-32-random-characters",
+  "session_ttl_hours": 336,
+  "otp_ttl_minutes": 10,
+  "otp_max_attempts": 5,
+  "otp_cooldown_seconds": 60,
+  "otp_email_limit": 5,
+  "otp_ip_limit": 20,
+  "invite_ttl_hours": 168,
+  "smtp_host": "smtp.gmail.com",
+  "smtp_port": 587,
+  "smtp_username": "you@example.com",
+  "smtp_password": "replace-with-google-app-password",
+  "mail_mode": "dev",
+  "mail_from": "Wayfarer <you@example.com>",
+  "trust_proxy_header": true
+}

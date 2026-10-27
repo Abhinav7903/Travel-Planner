@@ -1,0 +1,8 @@
+packages:
+  - apps/web
+allowBuilds:
+  core-js: true
+  unrs-resolver: true
+minimumReleaseAgeExclude:
+  - '@maplibre/vt-pbf@4.3.3'
+  - maplibre-gl@6.16.0

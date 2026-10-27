@@ -1,0 +1,41 @@
+# Environment and secrets
+.env
+.env.*
+apps/api/.env
+apps/api/config.json
+apps/api/gmail-client.json
+apps/web/.env.local
+!.env.example
+!*.env.example
+!.env.local.example
+*.pem
+*.key
+credentials.json
+
+# Node / Next.js
+node_modules/
+.pnpm-store/
+.next/
+out/
+dist/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+.turbo/
+.vercel/
+
+# Go
+apps/api/bin/
+apps/api/coverage.out
+
+# OS / editors
+*.swp
+.DS_Store
+.idea/
+.vscode/
+
+# Local data
+tmp/
+*.log
+client_secret_*.json

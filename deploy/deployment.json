@@ -1,0 +1,57 @@
+{
+  "project": "wayfarer",
+  "topology": {
+    "web": {
+      "platform": "vercel",
+      "root_directory": "apps/web",
+      "config": "apps/web/vercel.json",
+      "public": true
+    },
+    "api": {
+      "platform": "koyeb",
+      "config": "deploy/koyeb.json",
+      "public": true,
+      "access": "Public HTTPS, token-gated by X-Internal-Token; only the Vercel server reads the origin and token",
+      "image": "Dockerfile apps/api/Dockerfile",
+      "database": "Neon PostgreSQL"
+    },
+    "maps": {
+      "provider": "Leaflet with keyless OSM.de street tiles and Esri World Imagery satellite tiles",
+      "api_key_required": false
+    }
+  },
+  "environment": {
+    "web": {
+      "INTERNAL_API_BASE_URL": "Koyeb HTTPS origin (https://wayfarer-api-....koyeb.app); server-only, do not use NEXT_PUBLIC_",
+      "INTERNAL_API_TOKEN": "32+ random chars, same value as the API secret"
+    },
+    "api": {
+      "APP_ENV": "production",
+      "PORT": "8080",
+      "DATABASE_URL": "Neon pooled connection string with sslmode=require",
+      "DB_MAX_CONNS": "8",
+      "WEB_ORIGIN": "https://YOUR_VERCEL_DOMAIN",
+      "PUBLIC_WEB_URL": "https://YOUR_VERCEL_DOMAIN",
+      "OTP_HMAC_SECRET": "32+ random chars",
+      "SESSION_SECRET": "32+ random chars",
+      "INTERNAL_API_TOKEN": "32+ random chars, shared with Vercel",
+      "MAIL_MODE": "smtp",
+      "SMTP_HOST": "smtp.gmail.com",
+      "SMTP_PORT": "587",
+      "SMTP_USERNAME": "you@example.com",
+      "SMTP_PASSWORD": "Gmail app password (never commit; use a Koyeb secret)",
+      "MAIL_FROM": "Wayfarer <you@example.com>",
+      "TRUST_PROXY_HEADER": "true"
+    }
+  },
+  "steps": [
+    "Create a Neon project and copy the pooled DATABASE_URL into Koyeb secrets.",
+    "Run the migration job /app/migrate against Neon before the first deploy.",
+    "Build and deploy apps/api/Dockerfile to Koyeb with the koyeb.json values. Enable its HTTPS endpoint; /v1 rejects requests without the shared X-Internal-Token.",
+    "Set the Vercel project Root Directory to apps/web. Add INTERNAL_API_BASE_URL and INTERNAL_API_TOKEN in Vercel Project Settings (not in vercel.json).",
+    "Point WEB_ORIGIN and PUBLIC_WEB_URL at the final Vercel domain.",
+    "Set OTP_HMAC_SECRET, SESSION_SECRET, INTERNAL_API_TOKEN and SMTP_PASSWORD as Koyeb secrets; each required secret must be at least 32 characters.",
+    "Invite flow links use PUBLIC_WEB_URL; verify a full invitation round trip in production.",
+    "Maps use OSM.de and Esri World Imagery without an API key. If a tile provider is unavailable, the itinerary remains usable and the map shows a non-blocking notice."
+  ]
+}
