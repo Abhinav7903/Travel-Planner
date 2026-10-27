@@ -42,8 +42,10 @@ body {
   color: #163a2e;
 }
 
-a {
-  color: inherit;
+@layer base {
+  a {
+    color: inherit;
+  }
 }
 
 button,
