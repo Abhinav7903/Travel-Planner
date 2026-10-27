@@ -2,8 +2,11 @@ import type { Metadata, Viewport } from "next";
 import { ApiWakeGate } from "@/components/api-wake-gate";
 import "./globals.css";
 
+const siteUrl = "https://travel-smoky-eta.vercel.app";
+const ogImageUrl = `${siteUrl}/og-image.png`;
+
 export const metadata: Metadata = {
-  metadataBase: new URL("https://travel-smoky-eta.vercel.app"),
+  metadataBase: new URL(siteUrl),
   title: {
     default: "Wayfarer — a calmer way to plan a trip",
     template: "%s · Wayfarer",
@@ -16,7 +19,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: "website",
-    url: "/",
+    url: siteUrl,
     siteName: "Wayfarer",
     title: "Wayfarer — a calmer way to plan a trip",
     description:
@@ -24,9 +27,11 @@ export const metadata: Metadata = {
     locale: "en_US",
     images: [
       {
-        url: "/og-image.png",
+        url: ogImageUrl,
+        secureUrl: ogImageUrl,
         width: 1200,
         height: 630,
+        type: "image/png",
         alt: "Wayfarer — a calmer way to plan a trip",
       },
     ],
@@ -36,7 +41,7 @@ export const metadata: Metadata = {
     title: "Wayfarer — a calmer way to plan a trip",
     description:
       "A collaborative travel planner with an editable itinerary graph, group splits, shared notes and expense tracking.",
-    images: ["/og-image.png"],
+    images: [ogImageUrl],
   },
 };
 
