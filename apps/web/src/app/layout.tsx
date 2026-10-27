@@ -1,7 +1,9 @@
 import type { Metadata, Viewport } from "next";
+import { ApiWakeGate } from "@/components/api-wake-gate";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://travel-smoky-eta.vercel.app"),
   title: {
     default: "Wayfarer — a calmer way to plan a trip",
     template: "%s · Wayfarer",
@@ -11,6 +13,30 @@ export const metadata: Metadata = {
   applicationName: "Wayfarer",
   icons: {
     icon: [{ url: "/icon.svg", type: "image/svg+xml" }],
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    siteName: "Wayfarer",
+    title: "Wayfarer — a calmer way to plan a trip",
+    description:
+      "A collaborative travel planner with an editable itinerary graph, group splits, shared notes and expense tracking.",
+    locale: "en_US",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Wayfarer — a calmer way to plan a trip",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Wayfarer — a calmer way to plan a trip",
+    description:
+      "A collaborative travel planner with an editable itinerary graph, group splits, shared notes and expense tracking.",
+    images: ["/og-image.png"],
   },
 };
 
@@ -23,7 +49,9 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+      <body>
+        <ApiWakeGate>{children}</ApiWakeGate>
+      </body>
     </html>
   );
 }
