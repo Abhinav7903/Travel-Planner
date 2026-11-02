@@ -44,7 +44,7 @@ export function CreateTripButton({ label = "New trip" }: { label?: string }) {
       cover_image_url: "",
     };
   });
-  const zones = useMemo(timezoneOptions, []);
+  const zones = useMemo(() => timezoneOptions(), []);
 
   function update(key: keyof typeof form, value: string) {
     setForm((current) => {

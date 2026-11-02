@@ -222,39 +222,35 @@ export function MapWorkspace({
           .addTo(layer);
 
         try {
-          await import("leaflet-polylinedecorator" as any).catch(() => {});
-          const L2: any = await import("leaflet");
-          const factory = (L2 as any).polylineDecorator || (L2 as any).PolylineDecorator;
-          const symbol = (L2 as any).Symbol?.arrowHead || ((L2 as any).Symbol?.marker);
+          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+          // @ts-ignore
+          await import("leaflet-polylinedecorator").catch(() => {});
+          const L2 = (await import("leaflet")) as unknown as Record<string, unknown>;
+          type DecoratorFn = (layer: unknown, options: unknown) => { addTo: (map: unknown) => void };
+          type DecoratorClass = new (layer: unknown, options: unknown) => { addTo: (map: unknown) => void };
+          type SymbolFn = (opts: unknown) => unknown;
+
+          const factory = (L2.polylineDecorator || L2.PolylineDecorator) as DecoratorFn | DecoratorClass | undefined;
+          const symbolObj = L2.Symbol as { arrowHead?: SymbolFn; marker?: SymbolFn } | undefined;
+          const symbol = symbolObj?.arrowHead || symbolObj?.marker;
           if (factory && symbol) {
-            if ((L2 as any).polylineDecorator) {
-              (L2 as any).polylineDecorator(polyline, {
-                patterns: [
-                  {
-                    offset: "100%",
-                    repeat: 0,
-                    symbol: symbol({
-                      pixelSize: 10,
-                      polygon: false,
-                      pathOptions: { stroke: true, color, weight: 2 },
-                    }),
-                  },
-                ],
-              }).addTo(layer);
+            const patternOpts = {
+              patterns: [
+                {
+                  offset: "100%",
+                  repeat: 0,
+                  symbol: symbol({
+                    pixelSize: 10,
+                    polygon: false,
+                    pathOptions: { stroke: true, color, weight: 2 },
+                  }),
+                },
+              ],
+            };
+            if (typeof L2.polylineDecorator === "function") {
+              (L2.polylineDecorator as DecoratorFn)(polyline, patternOpts).addTo(layer);
             } else {
-              new factory(polyline, {
-                patterns: [
-                  {
-                    offset: "100%",
-                    repeat: 0,
-                    symbol: symbol({
-                      pixelSize: 10,
-                      polygon: false,
-                      pathOptions: { stroke: true, color, weight: 2 },
-                    }),
-                  },
-                ],
-              }).addTo(layer);
+              new (factory as DecoratorClass)(polyline, patternOpts).addTo(layer);
             }
           }
         } catch {

@@ -297,6 +297,9 @@ func (s *Server) clientIP(r *http.Request) string {
 	if err == nil {
 		return host
 	}
+	if ip := net.ParseIP(strings.TrimSpace(r.RemoteAddr)); ip != nil {
+		return ip.String()
+	}
 	return ""
 }
 
@@ -315,7 +318,11 @@ func decodeJSON(w http.ResponseWriter, r *http.Request, dst any) error {
 }
 
 func (s *Server) authorizeTrip(r *http.Request, tripID, action string) (string, error) {
-	role, err := s.store.GetMembership(r.Context(), tripID, s.user(r).ID)
+	u := s.user(r)
+	if u.ID == "" {
+		return "", apperr.ErrUnauthorized
+	}
+	role, err := s.store.GetMembership(r.Context(), tripID, u.ID)
 	if err != nil {
 		return "", apperr.ErrNotFound
 	}

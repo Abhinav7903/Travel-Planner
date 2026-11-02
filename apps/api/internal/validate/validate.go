@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"math"
 	"net/mail"
 	"net/url"
 	"strings"
@@ -116,8 +117,13 @@ func Coordinates(lat, lng *float64) error {
 	if (lat == nil) != (lng == nil) {
 		return apperr.WithFields(apperr.ErrValidation, map[string]string{"location": "Provide both latitude and longitude, or neither."})
 	}
-	if lat != nil && (*lat < -90 || *lat > 90 || *lng < -180 || *lng > 180) {
-		return apperr.WithFields(apperr.ErrValidation, map[string]string{"location": "Coordinates are out of range."})
+	if lat != nil {
+		if math.IsNaN(*lat) || math.IsInf(*lat, 0) || math.IsNaN(*lng) || math.IsInf(*lng, 0) {
+			return apperr.WithFields(apperr.ErrValidation, map[string]string{"location": "Coordinates must be valid numbers."})
+		}
+		if *lat < -90 || *lat > 90 || *lng < -180 || *lng > 180 {
+			return apperr.WithFields(apperr.ErrValidation, map[string]string{"location": "Coordinates are out of range."})
+		}
 	}
 	return nil
 }

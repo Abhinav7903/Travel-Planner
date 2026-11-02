@@ -40,7 +40,8 @@ export async function serverApi<T>(path: string, init: RequestInit = {}): Promis
     cache: "no-store",
     signal: AbortSignal.timeout(20_000),
   });
-  const payload = (await response.json().catch(() => ({}))) as ApiEnvelope<T> & ApiFailure;
+  const raw = await response.json().catch(() => ({}));
+  const payload = (raw ?? {}) as ApiEnvelope<T> & ApiFailure;
   if (!response.ok) {
     throw new ApiError(
       response.status,

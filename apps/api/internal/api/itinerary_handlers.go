@@ -1,6 +1,7 @@
 package api
 
 import (
+	"math"
 	"net/http"
 	"strconv"
 	"strings"
@@ -168,8 +169,8 @@ func sanitizeItem(in store.ItemInput) (store.ItemInput, error) {
 	if in.Notes, err = validate.Optional(in.Notes, "notes", 4000); err != nil {
 		return in, err
 	}
-	if in.CostMinor < 0 {
-		return in, validationError("cost_minor", "Cost cannot be negative.")
+	if in.CostMinor < 0 || in.CostMinor > 1_000_000_000_000 {
+		return in, validationError("cost_minor", "Cost is out of range.")
 	}
 	if in.CostMinor > 0 {
 		if in.Currency, err = validate.Currency(in.Currency); err != nil {
@@ -181,7 +182,8 @@ func sanitizeItem(in store.ItemInput) (store.ItemInput, error) {
 	if in.Link, err = validate.URLOrEmpty(in.Link, "link"); err != nil {
 		return in, err
 	}
-	if in.PosX < -100000 || in.PosX > 100000 || in.PosY < -100000 || in.PosY > 100000 {
+	if math.IsNaN(in.PosX) || math.IsInf(in.PosX, 0) || math.IsNaN(in.PosY) || math.IsInf(in.PosY, 0) ||
+		in.PosX < -100000 || in.PosX > 100000 || in.PosY < -100000 || in.PosY > 100000 {
 		return in, validationError("position", "Canvas position is out of range.")
 	}
 	if in.SortOrder < 0 {
@@ -272,7 +274,7 @@ func sanitizeEdge(in store.EdgeInput) (store.EdgeInput, error) {
 	if in.DurationMinutes < 0 || in.DurationMinutes > 100000 {
 		return in, validationError("duration_minutes", "Duration is out of range.")
 	}
-	if in.DistanceKM < 0 || in.DistanceKM > 100000 {
+	if math.IsNaN(in.DistanceKM) || math.IsInf(in.DistanceKM, 0) || in.DistanceKM < 0 || in.DistanceKM > 100000 {
 		return in, validationError("distance_km", "Distance is out of range.")
 	}
 	if in.DepartTime, err = validate.TimeValue(in.DepartTime, "depart_time"); err != nil {

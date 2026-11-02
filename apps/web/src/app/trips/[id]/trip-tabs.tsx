@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Map, NotebookPen, Route, Settings, Users, Wallet } from "lucide-react";
+import { CheckSquare, Map, NotebookPen, Route, Settings, Users, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const tabs = [
   { segment: "plan", label: "Itinerary", icon: Route },
   { segment: "map", label: "Map", icon: Map },
+  { segment: "checklist", label: "Checklist", icon: CheckSquare },
   { segment: "notes", label: "Notes", icon: NotebookPen },
   { segment: "money", label: "Money", icon: Wallet },
   { segment: "people", label: "People", icon: Users },

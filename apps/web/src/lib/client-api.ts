@@ -36,7 +36,8 @@ export async function browserApi<T>(path: string, init: RequestInit = {}): Promi
     headers,
     credentials: "same-origin",
   });
-  const payload = (await response.json().catch(() => ({}))) as ApiEnvelope<T> & ApiFailure;
+  const raw = await response.json().catch(() => ({}));
+  const payload = (raw ?? {}) as ApiEnvelope<T> & ApiFailure;
   if (!response.ok) {
     throw new BrowserApiError(
       response.status,

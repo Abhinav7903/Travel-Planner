@@ -8,6 +8,7 @@ import { Button, Spinner } from "@/components/ui/button";
 import { FieldError, FormError, Input, Label, Select, Textarea } from "@/components/ui/input";
 import { isShortGoogleMapsLink, parseGoogleMapsLink } from "@/lib/geo";
 import { modeLabel, parseMoneyInput, timeLabel } from "@/lib/utils";
+import { NavigationLinks } from "@/components/navigation-links";
 
 type PlaceSuggestion = {
   display_name: string;
@@ -228,9 +229,8 @@ function ItemForm({
   }, []);
 
   useEffect(() => {
-    if (!placeQuery.trim()) {
-      setPlaceSuggestions([]);
-      setShowPlaceDropdown(false);
+    const trimmed = placeQuery.trim();
+    if (!trimmed) {
       return;
     }
     const controller = new AbortController();
@@ -451,8 +451,13 @@ function ItemForm({
                   maxLength={200}
                   placeholder="Search for a place..."
                   onChange={(event) => {
-                    setPlaceQuery(event.target.value);
-                    update("location_name", event.target.value);
+                    const val = event.target.value;
+                    setPlaceQuery(val);
+                    update("location_name", val);
+                    if (!val.trim()) {
+                      setPlaceSuggestions([]);
+                      setShowPlaceDropdown(false);
+                    }
                   }}
                   onFocus={() => {
                     if (placeSuggestions.length > 0) setShowPlaceDropdown(true);
@@ -557,6 +562,17 @@ function ItemForm({
                     <Label htmlFor="item-lng">Longitude</Label>
                     <Input id="item-lng" inputMode="decimal" placeholder="135.7681" value={form.lng} onChange={(event) => update("lng", event.target.value)} />
                   </div>
+                </div>
+              ) : null}
+              {form.has_coordinates || form.location_name || form.address ? (
+                <div className="mt-3 border-t border-line/60 pt-2.5">
+                  <NavigationLinks
+                    latitude={form.has_coordinates && form.lat ? parseFloat(form.lat) : undefined}
+                    longitude={form.has_coordinates && form.lng ? parseFloat(form.lng) : undefined}
+                    address={form.address}
+                    locationName={form.location_name}
+                    size="sm"
+                  />
                 </div>
               ) : null}
             </div>

@@ -383,13 +383,24 @@ func (s *Store) Ledger(ctx context.Context, tripID string) ([]CurrencyLedger, er
 		return nil, err
 	}
 
+	currencies := map[string]struct{}{}
+	for c := range byCurrencyExpenses {
+		currencies[c] = struct{}{}
+	}
+	for c := range settlementsByCurrency {
+		currencies[c] = struct{}{}
+	}
+
 	ledgers := []CurrencyLedger{}
-	for currency, aggMap := range byCurrencyExpenses {
+	for currency := range currencies {
+		aggMap := byCurrencyExpenses[currency]
 		expenses := make([]money.Expense, 0, len(aggMap))
 		var total int64
 		for _, agg := range aggMap {
-			expenses = append(expenses, money.Expense{PayerID: agg.payerID, Amount: agg.amount, Splits: agg.splits})
-			total += agg.amount
+			if agg != nil {
+				expenses = append(expenses, money.Expense{PayerID: agg.payerID, Amount: agg.amount, Splits: agg.splits})
+				total += agg.amount
+			}
 		}
 		balances := money.NetBalances(userIDs, expenses, settlementsByCurrency[currency])
 		ledgers = append(ledgers, CurrencyLedger{

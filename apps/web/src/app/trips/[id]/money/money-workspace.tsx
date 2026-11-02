@@ -37,6 +37,7 @@ import { Button, Spinner } from "@/components/ui/button";
 import { Dialog } from "@/components/ui/dialog";
 import { EmptyState } from "@/components/ui/empty-state";
 import { FieldError, FormError, Input, Label, Select, Textarea } from "@/components/ui/input";
+import { BudgetAnalytics } from "@/components/budget-analytics";
 
 type Category = Expense["category"];
 
@@ -383,6 +384,10 @@ export function MoneyWorkspace({
           value={String(ledgers.reduce((sum, ledger) => sum + ledger.suggestions.length, 0))}
           detail="Suggested repayments, settled as you go"
         />
+      </div>
+
+      <div className="mt-6">
+        <BudgetAnalytics trip={trip} expenses={expenses} canEdit={canEdit} />
       </div>
 
       <div className="mt-6 grid items-start gap-5 xl:grid-cols-[minmax(0,1.55fr)_minmax(340px,.85fr)]">

@@ -3,6 +3,7 @@ package api
 import (
 	"net/http"
 	"strconv"
+	"strings"
 
 	"github.com/go-chi/chi/v5"
 
@@ -152,12 +153,14 @@ func (s *Server) handleCreateSettlement(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	var err error
-	if in.FromUserID == "" || in.ToUserID == "" {
-		s.writeError(w, r, validationError("people", "Choose who paid whom."))
+	in.FromUserID = strings.TrimSpace(in.FromUserID)
+	in.ToUserID = strings.TrimSpace(in.ToUserID)
+	if in.FromUserID == "" || in.ToUserID == "" || in.FromUserID == in.ToUserID {
+		s.writeError(w, r, validationError("people", "Choose two different people."))
 		return
 	}
-	if in.AmountMinor <= 0 {
-		s.writeError(w, r, validationError("amount_minor", "Amount must be greater than zero."))
+	if in.AmountMinor <= 0 || in.AmountMinor > 1_000_000_000_000 {
+		s.writeError(w, r, validationError("amount_minor", "Enter an amount between 0 and 1,000,000,000,000."))
 		return
 	}
 	if in.Currency, err = validate.Currency(in.Currency); err != nil {

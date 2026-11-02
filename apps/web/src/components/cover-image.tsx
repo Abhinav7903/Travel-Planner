@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 
 export function CoverImage({
   src,
@@ -13,22 +13,20 @@ export function CoverImage({
   className?: string;
   fallback: ReactNode;
 }) {
-  const [failed, setFailed] = useState(false);
+  const [failedSrc, setFailedSrc] = useState<string | null>(null);
 
-  useEffect(() => {
-    setFailed(false);
-  }, [src]);
-
-  if (!src || failed) return <>{fallback}</>;
+  if (!src || failedSrc === src) return <>{fallback}</>;
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
+      key={src}
       src={src}
       alt={alt}
       className={className}
       decoding="async"
-      onError={() => setFailed(true)}
+      loading="lazy"
+      onError={() => setFailedSrc(src)}
     />
   );
 }

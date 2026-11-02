@@ -1,6 +1,7 @@
 package validate
 
 import (
+	"math"
 	"testing"
 )
 
@@ -98,6 +99,14 @@ func TestURLAndCoordinates(t *testing.T) {
 	bad := 91.0
 	if err := Coordinates(&bad, &lng); err == nil {
 		t.Fatal("latitude out of range must fail")
+	}
+	nan := math.NaN()
+	if err := Coordinates(&nan, &lng); err == nil {
+		t.Fatal("NaN latitude must fail")
+	}
+	inf := math.Inf(1)
+	if err := Coordinates(&lat, &inf); err == nil {
+		t.Fatal("Inf longitude must fail")
 	}
 	if err := Coordinates(&lat, nil); err == nil {
 		t.Fatal("partial coordinates must fail")

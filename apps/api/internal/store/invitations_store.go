@@ -230,9 +230,9 @@ func maskEmail(email string) string {
 	if len(parts) != 2 {
 		return "•••"
 	}
-	local := parts[0]
-	if len(local) <= 2 {
+	runes := []rune(parts[0])
+	if len(runes) <= 2 {
 		return "••" + "@" + parts[1]
 	}
-	return local[:1] + strings.Repeat("•", len(local)-1) + "@" + parts[1]
+	return string(runes[:1]) + strings.Repeat("•", len(runes)-1) + "@" + parts[1]
 }

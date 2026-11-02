@@ -15,20 +15,40 @@ type Error struct {
 	Fields  map[string]string `json:"fields,omitempty"`
 }
 
-func (e *Error) Error() string { return fmt.Sprintf("%s: %s", e.Code, e.Message) }
+func (e *Error) Error() string {
+	if e == nil {
+		return "<nil>"
+	}
+	return fmt.Sprintf("%s: %s", e.Code, e.Message)
+}
 
 func New(status int, code, message string) *Error {
 	return &Error{Status: status, Code: code, Message: message}
 }
 
 func WithFields(e *Error, fields map[string]string) *Error {
-	e.Fields = fields
-	return e
+	if e == nil {
+		return &Error{
+			Status:  http.StatusUnprocessableEntity,
+			Code:    "validation_failed",
+			Message: "Validation failed.",
+			Fields:  fields,
+		}
+	}
+	clone := *e
+	clone.Fields = fields
+	return &clone
 }
 
 func Is(err error, target *Error) bool {
+	if err == nil || target == nil {
+		return err == nil && target == nil
+	}
 	var e *Error
 	if errors.As(err, &e) {
+		if e == nil {
+			return false
+		}
 		return e.Code == target.Code
 	}
 	return false

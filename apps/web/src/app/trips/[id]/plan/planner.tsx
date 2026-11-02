@@ -9,13 +9,12 @@ import {
   ReactFlow,
   type Connection,
   type Edge,
-  type Node,
-  type NodeChange,
   type OnNodeDrag,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import {
   ArrowRight,
+  Calendar,
   CalendarDays,
   FileDown,
   LayoutList,
@@ -29,6 +28,9 @@ import {
 import type { ItineraryDay, ItineraryEdge, ItineraryItem, Member, Trip, TripGroup } from "@/lib/types";
 import { browserApi, BrowserApiError } from "@/lib/client-api";
 import { exportPlannerPDF } from "@/lib/pdf";
+import { downloadCalendarICS } from "@/lib/calendar";
+import { WeatherBadge } from "@/components/weather-badge";
+import { NavigationLinks } from "@/components/navigation-links";
 import { cn, errorMessage, formatDay, kindLabel, modeLabel, timeLabel } from "@/lib/utils";
 import { Button, Spinner } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -58,7 +60,12 @@ export function Planner({
   const [days, setDays] = useState(initialDays);
   const [dayIndex, setDayIndex] = useState(0);
   const [filter, setFilter] = useState("all");
-  const [view, setView] = useState<View>("graph");
+  const [view, setView] = useState<View>(() => {
+    if (typeof window !== "undefined" && window.matchMedia("(max-width: 900px)").matches) {
+      return "timeline";
+    }
+    return "graph";
+  });
   const [selection, setSelection] = useState<Selection>(null);
   const [busy, setBusy] = useState(false);
   const [exporting, setExporting] = useState(false);
@@ -68,9 +75,10 @@ export function Planner({
 
   const day = days[dayIndex] ?? days[0];
 
-  useEffect(() => {
-    if (window.matchMedia("(max-width: 900px)").matches) setView("timeline");
-  }, []);
+  const dayFirstCoord = useMemo(() => {
+    const itemWithCoords = day?.items.find((item) => item.has_coordinates && item.latitude && item.longitude);
+    return itemWithCoords ? { latitude: itemWithCoords.latitude, longitude: itemWithCoords.longitude } : null;
+  }, [day]);
 
   useEffect(() => {
     if (!toast) return;
@@ -190,14 +198,14 @@ export function Planner({
     };
   }, [selection, day, filter, trip.id, trip.currency]);
 
-  async function refresh() {
+  const refresh = useCallback(async () => {
     try {
       const data = await browserApi<{ days: ItineraryDay[] }>(`/api/v1/trips/${trip.id}/itinerary`);
       setDays(data.days ?? []);
     } catch {
       // The visible error below is enough; a reload remains available.
     }
-  }
+  }, [trip.id]);
 
   function showError(error: unknown) {
     setToast({ message: errorMessage(error), tone: "error" });
@@ -343,11 +351,11 @@ export function Planner({
         ...candidate,
         items: candidate.items.map((entry) => entry.id === itemID ? updated : entry),
       })));
-    } catch (error) {
+    } catch {
       showError(new Error("Could not save the new position. Refreshing the canvas."));
       await refresh();
     }
-  }, [days, trip.id]);
+  }, [days, trip.id, refresh]);
 
   const onNodeDragStop: OnNodeDrag<PlannerNode> = useCallback((_event, node) => {
     if (!canEdit) return;
@@ -393,6 +401,15 @@ export function Planner({
       showError(error);
     } finally {
       setBusy(false);
+    }
+  }
+
+  function exportICS() {
+    try {
+      downloadCalendarICS(trip, days);
+      setToast({ message: "iCalendar (.ics) downloaded.", tone: "ok" });
+    } catch (error) {
+      showError(error);
     }
   }
 
@@ -482,13 +499,21 @@ export function Planner({
               </>
             )}
           </div>
-          <p className="mt-2 flex items-center gap-1.5 text-[12px] text-ink-soft">
-            <CalendarDays size={12} /> {formatDay(day.date, "EEEE, MMMM d, yyyy")}
-            <span className="mx-1 text-line-strong">·</span>
-            {visibleItems.length} {visibleItems.length === 1 ? "stop" : "stops"}
-          </p>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-[12px] text-ink-soft">
+            <span className="flex items-center gap-1.5">
+              <CalendarDays size={12} /> {formatDay(day.date, "EEEE, MMMM d, yyyy")}
+            </span>
+            <span className="text-line-strong">·</span>
+            <span>{visibleItems.length} {visibleItems.length === 1 ? "stop" : "stops"}</span>
+            {dayFirstCoord ? (
+              <WeatherBadge latitude={dayFirstCoord.latitude} longitude={dayFirstCoord.longitude} date={day.date} />
+            ) : null}
+          </div>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <Button variant="secondary" onClick={() => exportICS()} title="Export trip schedule to Apple, Google or Outlook Calendar (.ics)">
+            <Calendar size={15} /> Export calendar (.ics)
+          </Button>
           <Button variant="secondary" onClick={() => void exportPDF()} disabled={exporting}>
             {exporting ? <Spinner /> : <FileDown size={15} />} Export planner
           </Button>
@@ -836,6 +861,16 @@ function Timeline({
                     {item.start_time && item.end_time ? <span>{timeLabel(item.start_time)} – {timeLabel(item.end_time)}</span> : null}
                   </span>
                   {item.notes ? <span className="mt-1.5 block line-clamp-2 text-[11px] leading-relaxed text-ink-faint">{item.notes}</span> : null}
+                  {item.has_coordinates || item.location_name || item.address ? (
+                    <NavigationLinks
+                      latitude={item.latitude}
+                      longitude={item.longitude}
+                      address={item.address}
+                      locationName={item.location_name}
+                      size="sm"
+                      className="mt-2"
+                    />
+                  ) : null}
                 </span>
                 <ArrowRight size={14} className="mt-1.5 shrink-0 text-ink-faint opacity-0 transition-opacity group-hover:opacity-100" />
               </button>

@@ -32,7 +32,7 @@ func writeData(w http.ResponseWriter, status int, data any) {
 
 func (s *Server) writeError(w http.ResponseWriter, r *http.Request, err error) {
 	var apiErr *apperr.Error
-	if !errors.As(err, &apiErr) {
+	if !errors.As(err, &apiErr) || apiErr == nil {
 		if errors.Is(err, context.DeadlineExceeded) {
 			apiErr = apperr.New(503, "timeout", "The request took too long. Please try again.")
 		} else {
@@ -40,9 +40,13 @@ func (s *Server) writeError(w http.ResponseWriter, r *http.Request, err error) {
 			apiErr = apperr.ErrInternal
 		}
 	}
+	status := apiErr.Status
+	if status < 100 || status > 599 {
+		status = http.StatusInternalServerError
+	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(apiErr.Status)
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(envelope{Error: &errorBody{
 		Code:      apiErr.Code,
 		Message:   apiErr.Message,
@@ -55,12 +59,16 @@ func (s *Server) writeError(w http.ResponseWriter, r *http.Request, err error) {
 // access to the Server logger. Internal failures stay generic.
 func writeError(w http.ResponseWriter, r *http.Request, err error) {
 	var apiErr *apperr.Error
-	if !errors.As(err, &apiErr) {
+	if !errors.As(err, &apiErr) || apiErr == nil {
 		apiErr = apperr.ErrInternal
+	}
+	status := apiErr.Status
+	if status < 100 || status > 599 {
+		status = http.StatusInternalServerError
 	}
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.Header().Set("Cache-Control", "no-store")
-	w.WriteHeader(apiErr.Status)
+	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(envelope{Error: &errorBody{
 		Code:      apiErr.Code,
 		Message:   apiErr.Message,
