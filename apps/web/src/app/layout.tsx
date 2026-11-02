@@ -53,8 +53,14 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              '(function(){try{var h=new Date().getHours();var t=h>=5&&h<8?"dawn":h>=8&&h<17?"day":h>=17&&h<20?"dusk":"night";document.documentElement.dataset.tod=t;}catch(e){}})();',
+          }}
+        />
         <ApiWakeGate>{children}</ApiWakeGate>
       </body>
     </html>

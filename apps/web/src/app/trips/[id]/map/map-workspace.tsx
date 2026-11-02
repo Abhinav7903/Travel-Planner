@@ -50,10 +50,19 @@ export function MapWorkspace({
 
   const groupByID = useMemo(() => new Map(groups.map((group) => [group.id, group])), [groups]);
   const located = useMemo(() => {
+    const ordered = days.flatMap((day) => day.items).sort((a, b) => {
+      const dayA = days.findIndex((d) => d.id === a.day_id);
+      const dayB = days.findIndex((d) => d.id === b.day_id);
+      if (dayA !== dayB) return dayA - dayB;
+      if (a.start_time && b.start_time && a.start_time !== b.start_time) return a.start_time.localeCompare(b.start_time);
+      return (a.sort_order ?? 0) - (b.sort_order ?? 0);
+    });
+    const seqMap = new Map<string, number>();
+    ordered.forEach((item, idx) => seqMap.set(item.id, idx + 1));
     return days.flatMap((day, index) =>
       day.items
         .filter((item) => item.has_coordinates)
-        .map((item) => ({ item, day, dayNumber: index + 1 })),
+        .map((item) => ({ item, day, dayNumber: index + 1, seq: seqMap.get(item.id) ?? index + 1 })),
     );
   }, [days]);
 
@@ -138,8 +147,8 @@ export function MapWorkspace({
         element.type = "button";
         element.className = "group relative flex h-7 w-7 items-center justify-center rounded-full border-2 border-paper text-[10px] font-semibold text-white shadow-[0_2px_10px_rgba(37,39,33,.28)] transition-transform hover:scale-110 focus-visible:scale-110";
         element.style.background = color;
-        element.textContent = String(entry.dayNumber);
-        element.setAttribute("aria-label", `${entry.item.title}, day ${entry.dayNumber}, ${timeLabel(entry.item.start_time)}`);
+        element.textContent = String(entry.seq ?? entry.dayNumber);
+        element.setAttribute("aria-label", `${entry.item.title}, stop ${entry.seq ?? entry.dayNumber}, ${timeLabel(entry.item.start_time)}`);
 
         const marker = L.marker([entry.item.latitude, entry.item.longitude], {
           icon: L.divIcon({ html: element, className: "", iconSize: [28, 28], iconAnchor: [14, 14] }),
@@ -196,7 +205,7 @@ export function MapWorkspace({
         const label = document.createElement("span");
         label.textContent = `${from.title} → ${to.title} · ${modeLabel[edge.mode] ?? edge.mode} · ${duration}${distance}`;
 
-        L.polyline(
+        const polyline = L.polyline(
           [
             [from.latitude, from.longitude],
             [to.latitude, to.longitude],
@@ -204,13 +213,53 @@ export function MapWorkspace({
           {
             color,
             weight: 3,
-            opacity: 0.82,
+            opacity: 0.9,
             dashArray: edge.duration_minutes > 0 ? undefined : "6 7",
             lineCap: "round",
           },
         )
           .bindTooltip(label, { sticky: true })
           .addTo(layer);
+
+        try {
+          await import("leaflet-polylinedecorator" as any).catch(() => {});
+          const L2: any = await import("leaflet");
+          const factory = (L2 as any).polylineDecorator || (L2 as any).PolylineDecorator;
+          const symbol = (L2 as any).Symbol?.arrowHead || ((L2 as any).Symbol?.marker);
+          if (factory && symbol) {
+            if ((L2 as any).polylineDecorator) {
+              (L2 as any).polylineDecorator(polyline, {
+                patterns: [
+                  {
+                    offset: "100%",
+                    repeat: 0,
+                    symbol: symbol({
+                      pixelSize: 10,
+                      polygon: false,
+                      pathOptions: { stroke: true, color, weight: 2 },
+                    }),
+                  },
+                ],
+              }).addTo(layer);
+            } else {
+              new factory(polyline, {
+                patterns: [
+                  {
+                    offset: "100%",
+                    repeat: 0,
+                    symbol: symbol({
+                      pixelSize: 10,
+                      polygon: false,
+                      pathOptions: { stroke: true, color, weight: 2 },
+                    }),
+                  },
+                ],
+              }).addTo(layer);
+            }
+          }
+        } catch {
+          // ignore
+        }
       }
     })();
 
@@ -351,7 +400,7 @@ export function MapWorkspace({
                         className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[9px] font-semibold text-white"
                         style={{ background: group?.color ?? "#1f4d3d" }}
                       >
-                        {entry.dayNumber}
+                        {entry.seq ?? entry.dayNumber}
                       </span>
                       <span className="min-w-0 flex-1">
                         <span className="block truncate text-[12.5px] font-medium">{entry.item.title}</span>

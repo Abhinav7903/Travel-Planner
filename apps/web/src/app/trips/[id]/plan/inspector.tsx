@@ -1,13 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { ArrowRight, Clock3, MapPin, Trash2, X } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowRight, Clock3, MapPin, Search, Trash2, X } from "lucide-react";
 import { browserApi, BrowserApiError } from "@/lib/client-api";
 import type { EdgeMode, ItineraryEdge, ItineraryItem, ItemKind, MapResolution, TripGroup } from "@/lib/types";
 import { Button, Spinner } from "@/components/ui/button";
 import { FieldError, FormError, Input, Label, Select, Textarea } from "@/components/ui/input";
 import { isShortGoogleMapsLink, parseGoogleMapsLink } from "@/lib/geo";
 import { modeLabel, parseMoneyInput, timeLabel } from "@/lib/utils";
+
+type PlaceSuggestion = {
+  display_name: string;
+  lat: string;
+  lon: string;
+  place_id: number;
+};
 
 export type ItemDraft = {
   day_id: string;
@@ -199,10 +206,79 @@ function ItemForm({
   const [resolvingLink, setResolvingLink] = useState(false);
   const [localError, setLocalError] = useState("");
   const [linkFeedback, setLinkFeedback] = useState<{ tone: "success" | "error"; message: string } | null>(null);
+  const [placeQuery, setPlaceQuery] = useState("");
+  const [placeSuggestions, setPlaceSuggestions] = useState<PlaceSuggestion[]>([]);
+  const [placeSearching, setPlaceSearching] = useState(false);
+  const [showPlaceDropdown, setShowPlaceDropdown] = useState(false);
+  const placeBoxRef = useRef<HTMLDivElement>(null);
 
   function update<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
     setFields({ ...fields, [key]: "" });
+  }
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (placeBoxRef.current && !placeBoxRef.current.contains(event.target as Node)) {
+        setShowPlaceDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (!placeQuery.trim()) {
+      setPlaceSuggestions([]);
+      setShowPlaceDropdown(false);
+      return;
+    }
+    const controller = new AbortController();
+    const timeout = setTimeout(async () => {
+      setPlaceSearching(true);
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(placeQuery.trim())}&format=json&addressdetails=1&limit=6`,
+          {
+            headers: {
+              "User-Agent": "Wayfarer/1.0 (travel planner)",
+            },
+            signal: controller.signal,
+          },
+        );
+        if (!res.ok) return;
+        const data = (await res.json()) as PlaceSuggestion[];
+        setPlaceSuggestions(data);
+        setShowPlaceDropdown(data.length > 0);
+      } catch {
+        // ignore
+      } finally {
+        setPlaceSearching(false);
+      }
+    }, 250);
+    return () => {
+      controller.abort();
+      clearTimeout(timeout);
+    };
+  }, [placeQuery]);
+
+  function selectPlace(place: PlaceSuggestion) {
+    const lat = parseFloat(place.lat);
+    const lng = parseFloat(place.lon);
+    setForm((current) => ({
+      ...current,
+      title: current.title.trim() ? current.title : place.display_name.split(",")[0] || place.display_name,
+      location_name: place.display_name.split(",")[0] || place.display_name,
+      address: place.display_name,
+      lat: String(lat),
+      lng: String(lng),
+      has_coordinates: Number.isFinite(lat) && Number.isFinite(lng),
+      link: `https://www.google.com/maps?q=${lat},${lng}`,
+    }));
+    setPlaceQuery("");
+    setPlaceSuggestions([]);
+    setShowPlaceDropdown(false);
+    setLinkFeedback({ tone: "success", message: "Location set from search." });
   }
 
   async function applyLink() {
@@ -366,9 +442,45 @@ function ItemForm({
             </div>
             <div>
               <Label htmlFor="item-location">Place name</Label>
-              <div className="relative">
-                <MapPin size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
-                <Input id="item-location" className="pl-8" value={form.location_name} maxLength={200} onChange={(event) => update("location_name", event.target.value)} />
+              <div className="relative" ref={placeBoxRef}>
+                <Search size={13} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-ink-faint" />
+                <Input
+                  id="item-location"
+                  className="pl-8"
+                  value={placeQuery || form.location_name}
+                  maxLength={200}
+                  placeholder="Search for a place..."
+                  onChange={(event) => {
+                    setPlaceQuery(event.target.value);
+                    update("location_name", event.target.value);
+                  }}
+                  onFocus={() => {
+                    if (placeSuggestions.length > 0) setShowPlaceDropdown(true);
+                  }}
+                />
+                {placeSearching ? (
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-ink-faint">
+                    <Spinner />
+                  </span>
+                ) : null}
+                {showPlaceDropdown && placeSuggestions.length > 0 ? (
+                  <div className="absolute left-0 right-0 top-full z-50 mt-1 max-h-64 overflow-auto rounded-xl border border-line bg-paper shadow-lg">
+                    {placeSuggestions.map((place) => (
+                      <button
+                        key={place.place_id}
+                        type="button"
+                        onClick={() => selectPlace(place)}
+                        className="flex w-full items-start gap-2 px-3 py-2 text-left hover:bg-[#f7f3ea]"
+                      >
+                        <MapPin size={12} className="mt-0.5 shrink-0 text-ink-faint" />
+                        <span className="min-w-0">
+                          <span className="block truncate text-[12px] font-medium">{place.display_name.split(",")[0]}</span>
+                          <span className="block truncate text-[10px] text-ink-faint">{place.display_name}</span>
+                        </span>
+                      </button>
+                    ))}
+                  </div>
+                ) : null}
               </div>
             </div>
             <div>
