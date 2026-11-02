@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { ArrowLeft, ArrowRight, Mail } from "lucide-react";
 import { browserApi, BrowserApiError } from "@/lib/client-api";
 import { Button, Spinner } from "@/components/ui/button";
+import { Dialog } from "@/components/ui/dialog";
 import { FieldError, FormError, Input, Label } from "@/components/ui/input";
 
 type RequestResponse = { expires_at?: string; dev_code?: string; message?: string };
@@ -20,6 +21,7 @@ export function LoginForm({ next }: { next: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
   const [fieldError, setFieldError] = useState("");
+  const [showSpamNotice, setShowSpamNotice] = useState(false);
   const codeRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -53,6 +55,7 @@ export function LoginForm({ next }: { next: string }) {
       setStage("code");
       setCode("");
       setCooldown(60);
+      setShowSpamNotice(true);
     } catch (err) {
       setExpiresAt("");
       if (err instanceof BrowserApiError) {
@@ -131,65 +134,82 @@ export function LoginForm({ next }: { next: string }) {
   }
 
   return (
-    <form onSubmit={verify} noValidate className="space-y-4">
-      <FormError>{error}</FormError>
-      <div>
-        <Label htmlFor="code" hint={email}>
-          Six-digit code
-        </Label>
-        <Input
-          ref={codeRef}
-          id="code"
-          name="code"
-          type="text"
-          inputMode="numeric"
-          autoComplete="one-time-code"
-          pattern="[0-9]{6}"
-          maxLength={6}
-          placeholder="000000"
-          value={code}
-          onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
-          className="h-14 text-center text-[1.5rem] tracking-[0.4em] tabular-nums"
-          aria-invalid={Boolean(fieldError)}
-        />
-        <FieldError>{fieldError}</FieldError>
-        {expiryLabel ? (
-          <p aria-live="polite" className="mt-2 text-[11.5px] text-ink-faint">
-            Code sent. It expires at {expiryLabel} your local time.
+    <>
+      <Dialog
+        open={showSpamNotice}
+        onClose={() => setShowSpamNotice(false)}
+        title="Don't see the code?"
+        description={`We sent a six-digit code to ${email}.`}
+      >
+        <div className="space-y-4">
+          <p className="text-[13px] leading-relaxed text-ink-soft">
+            It may land in your spam or junk folder. Please check both your inbox and spam before requesting a new code.
           </p>
-        ) : null}
-        {devCode ? (
-          <p className="mt-2 rounded-lg border border-line bg-sand/60 px-3 py-2 text-[11.5px] text-ink-soft">
-            Development delivery — your code is <strong className="tracking-[0.15em]">{devCode}</strong>
-          </p>
-        ) : null}
-      </div>
-      <Button type="submit" size="lg" className="w-full justify-between" disabled={busy || code.length !== 6}>
-        <span>{busy ? "Verifying" : "Enter Wayfarer"}</span>
-        {busy ? <Spinner /> : <ArrowRight size={16} />}
-      </Button>
-      <div className="flex items-center justify-between pt-1">
-        <button
-          type="button"
-          onClick={() => {
-            setStage("email");
-            setError("");
-            setCode("");
-            setExpiresAt("");
-          }}
-          className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-soft hover:text-ink"
-        >
-          <ArrowLeft size={13} /> Use another email
-        </button>
-        <button
-          type="button"
-          onClick={() => requestCode()}
-          disabled={busy || cooldown > 0}
-          className="text-[12px] font-medium text-forest transition-opacity disabled:text-ink-faint"
-        >
-          {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
-        </button>
-      </div>
-    </form>
+          <Button className="w-full" onClick={() => setShowSpamNotice(false)}>
+            Got it
+          </Button>
+        </div>
+      </Dialog>
+      <form onSubmit={verify} noValidate className="space-y-4">
+        <FormError>{error}</FormError>
+        <div>
+          <Label htmlFor="code" hint={email}>
+            Six-digit code
+          </Label>
+          <Input
+            ref={codeRef}
+            id="code"
+            name="code"
+            type="text"
+            inputMode="numeric"
+            autoComplete="one-time-code"
+            pattern="[0-9]{6}"
+            maxLength={6}
+            placeholder="000000"
+            value={code}
+            onChange={(event) => setCode(event.target.value.replace(/\D/g, "").slice(0, 6))}
+            className="h-14 text-center text-[1.5rem] tracking-[0.4em] tabular-nums"
+            aria-invalid={Boolean(fieldError)}
+          />
+          <FieldError>{fieldError}</FieldError>
+          {expiryLabel ? (
+            <p aria-live="polite" className="mt-2 text-[11.5px] text-ink-faint">
+              Code sent. It expires at {expiryLabel} your local time.
+            </p>
+          ) : null}
+          {devCode ? (
+            <p className="mt-2 rounded-lg border border-line bg-sand/60 px-3 py-2 text-[11.5px] text-ink-soft">
+              Development delivery — your code is <strong className="tracking-[0.15em]">{devCode}</strong>
+            </p>
+          ) : null}
+        </div>
+        <Button type="submit" size="lg" className="w-full justify-between" disabled={busy || code.length !== 6}>
+          <span>{busy ? "Verifying" : "Enter Wayfarer"}</span>
+          {busy ? <Spinner /> : <ArrowRight size={16} />}
+        </Button>
+        <div className="flex items-center justify-between pt-1">
+          <button
+            type="button"
+            onClick={() => {
+              setStage("email");
+              setError("");
+              setCode("");
+              setExpiresAt("");
+            }}
+            className="inline-flex items-center gap-1.5 text-[12px] font-medium text-ink-soft hover:text-ink"
+          >
+            <ArrowLeft size={13} /> Use another email
+          </button>
+          <button
+            type="button"
+            onClick={() => requestCode()}
+            disabled={busy || cooldown > 0}
+            className="text-[12px] font-medium text-forest transition-opacity disabled:text-ink-faint"
+          >
+            {cooldown > 0 ? `Resend in ${cooldown}s` : "Resend code"}
+          </button>
+        </div>
+      </form>
+    </>
   );
 }
